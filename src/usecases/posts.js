@@ -8,11 +8,11 @@ const getAll = async () => {
     .populate("category_id")
     .exec();
 
-    [...result].forEach((post) => {
-      post.title = decode(post.title);
-    });
-    
-    return result;
+  [...result].forEach((post) => {
+    post.title = decode(post.title);
+  });
+
+  return result;
 };
 
 const getPopulars = async () =>
@@ -23,21 +23,28 @@ const getPopulars = async () =>
     .limit(5);
 
 const getByCategory = async (needle) => {
+  let newArr = [];
+
+  needle.forEach((val) => {
+    newArr.push({ category_id: ObjectID(val) });
+  });
+
   let result = await Posts.find({
-    $or: [
-      { category_id: ObjectID("5f7ba098a90572b00de7f56e") },
-      { category_id: ObjectID("5f7ba0b0a90572b00de7f570") },
-    ],
+    // $or: [
+    //   { category_id: ObjectID("5f7ba098a90572b00de7f56e") },
+    //   { category_id: ObjectID("5f7ba0a9a90572b00de7f56f") },
+    // ],
+    $or: newArr,
   })
     .populate("user_id")
     .populate("category_id")
     .exec();
 
-    [...result].forEach((post) => {
-      post.title = decode(post.title);
-    });
-    
-    return result;
+  [...result].forEach((post) => {
+    post.title = decode(post.title);
+  });
+
+  return result;
 };
 
 const searchPosts = async (needle) => {
@@ -49,7 +56,7 @@ const searchPosts = async (needle) => {
   [...result].forEach((post) => {
     post.title = decode(post.title);
   });
-  
+
   return result;
 };
 

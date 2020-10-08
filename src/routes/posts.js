@@ -6,6 +6,7 @@ const {
   create,
   getPopulars,
   getByCategory,
+  getById,
   searchPosts,
 } = require("../usecases/posts");
 
@@ -31,6 +32,23 @@ router.get("/", async (request, response) => {
 router.get("/populars", async (request, response) => {
   try {
     const postsResponse = await getPopulars();
+
+    response.json({
+      success: true,
+      data   : postsResponse,
+    });
+  } catch (error) {
+    response.status(400).json({
+      success: false,
+      error  : error.message,
+    });
+  }
+});
+
+router.get("/:id", async (request, response) => {
+  try {
+    const id = request.params.id
+    const postsResponse = await getById(id);
 
     response.json({
       success: true,

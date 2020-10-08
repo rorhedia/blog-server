@@ -1,5 +1,5 @@
-const { ObjectID }       = require("mongodb");
-const Posts              = require("../models/posts");
+const { ObjectID } = require("mongodb");
+const Posts = require("../models/posts");
 const { encode, decode } = require("../lib/validations");
 
 const getAll = async () => {
@@ -15,12 +15,32 @@ const getAll = async () => {
   return result;
 };
 
-const getPopulars = async () =>
-  await Posts.find()
+const getById = async (id) => {
+  let result = await Posts.find({ _id: id })
+    .populate("user_id")
+    .populate("category_id")
+    .exec();
+
+  [...result].forEach((post) => {
+    post.title = decode(post.title);
+  });
+
+  return result;
+};
+
+const getPopulars = async () => {
+  let result = await Posts.find()
     .populate("user_id")
     .populate("category_id")
     .sort({ visits: -1 })
     .limit(5);
+
+  [...result].forEach((post) => {
+    post.title = decode(post.title);
+  });
+
+  return result;
+};
 
 const getByCategory = async (needle) => {
   let newArr = [];
@@ -63,7 +83,7 @@ const searchPosts = async (needle) => {
 const create = async (data) => {
   let { title, content } = data;
 
-  title   = encode(title);
+  title = encode(title);
   content = encode(content);
 
   let dataEncoded = {
@@ -77,6 +97,13 @@ const create = async (data) => {
   return result;
 };
 
-module.exports = { getAll, getPopulars, getByCategory, searchPosts, create };
+module.exports = {
+  getAll,
+  getPopulars,
+  getByCategory,
+  getById,
+  searchPosts,
+  create,
+};
 
 // {"$or":[{"title":"Prueba"},{"title":"Prueba tres"}]}
